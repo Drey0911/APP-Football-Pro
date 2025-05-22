@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${competicion.id} ? 'Editar Competición' : 'Nueva Competición'"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="bi bi-trophy-fill me-2"></i>
+                Football Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clubes"><i class="bi bi-shield-fill me-1"></i> Clubes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jugadores"><i class="bi bi-person-badge me-1"></i> Jugadores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/entrenadores"><i class="bi bi-person-video3 me-1"></i> Entrenadores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/asociaciones"><i class="bi bi-people me-1"></i> Asociaciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/competiciones"><i class="bi bi-trophy me-1"></i> Competiciones</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg animate__animated animate__fadeInUp">
+                    <div class="card-header py-3">
+                        <h3 class="mb-0 fw-bold text-white" th:text="${competicion.id} ? 'Editar Competición' : 'Nueva Competición'"></h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/competiciones/guardar}" th:object="${competicion}" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <!-- Sección 1: Información básica -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold section-title">
+                                    <i class="bi bi-info-circle"></i> Información Básica
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+                                        <div class="invalid-feedback">Por favor ingresa el nombre de la competición</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="montoPremio" class="form-label">Monto Premio ($) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="montoPremio" th:field="*{montoPremio}" min="0" required>
+                                        <div class="invalid-feedback">Por favor ingresa un monto válido</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br> <br>
+                            <!-- Sección 2: Fechas -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold section-title">
+                                    <i class="bi bi-calendar-event"></i> Fechas
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="fechaInicio" class="form-label">Fecha Inicio <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="fechaInicio" 
+                                               th:value="${#temporals.format(competicion.fechaInicio, 'yyyy-MM-dd')}" 
+                                               name="fechaInicio" required>
+                                        <div class="invalid-feedback">Por favor selecciona la fecha de inicio</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="fechaFin" class="form-label">Fecha Fin <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="fechaFin" 
+                                               th:value="${#temporals.format(competicion.fechaFin, 'yyyy-MM-dd')}" 
+                                               name="fechaFin" required>
+                                        <div class="invalid-feedback">Por favor selecciona la fecha de fin</div>
+                                    </div>
+                                </div>
+                            </div>
+<br> <br>
+                            <div class="mb-4">
+    <h5 class="fw-bold section-title">
+        <i class="bi bi-shield"></i> Clubes Participantes
+    </h5>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div th:each="club : ${todosClubes}" class="col-md-4 mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" 
+                               th:id="'club_' + ${club.id}"
+                               th:value="${club.id}"
+                               name="clubesIds"
+                               th:checked="${competicion.clubes.?[id == club.id].size() > 0}">
+                        <label class="form-check-label" th:for="'club_' + ${club.id}" 
+                               th:text="${club.nombre}"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                            
+                            <!-- Botones de acción -->
+                            <div class="d-flex justify-content-between pt-3">
+                                <a th:href="@{/competiciones}" class="btn btn-outline-gold">
+                                    <i class="bi bi-arrow-left me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-gold">
+                                    <i class="bi bi-save me-1"></i> Guardar Competición
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación del formulario
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form.needs-validation');
+            
+            // Validación de fechas
+            const fechaInicio = document.getElementById('fechaInicio');
+            const fechaFin = document.getElementById('fechaFin');
+            
+            fechaInicio.addEventListener('change', function() {
+                if (fechaInicio.value && fechaFin.value) {
+                    validarFechas();
+                }
+            });
+            
+            fechaFin.addEventListener('change', function() {
+                if (fechaInicio.value && fechaFin.value) {
+                    validarFechas();
+                }
+            });
+            
+            function validarFechas() {
+                if (new Date(fechaInicio.value) > new Date(fechaFin.value)) {
+                    fechaFin.setCustomValidity('La fecha de fin debe ser posterior a la fecha de inicio');
+                } else {
+                    fechaFin.setCustomValidity('');
+                }
+            }
+            
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+                
+                if (form.checkValidity()) {
+                    // Mostrar loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Guardando...
+                    `;
+                }
+            });
+            
+            // Resaltar el enlace activo en la navbar
+            const currentPage = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar .nav-link');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

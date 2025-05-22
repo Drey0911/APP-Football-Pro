@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Competiciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="bi bi-trophy-fill me-2"></i>
+                Football Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clubes"><i class="bi bi-shield-fill me-1"></i> Clubes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jugadores"><i class="bi bi-person-badge me-1"></i> Jugadores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/entrenadores"><i class="bi bi-person-video3 me-1"></i> Entrenadores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/asociaciones"><i class="bi bi-people me-1"></i> Asociaciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/competiciones"><i class="bi bi-trophy me-1"></i> Competiciones</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container py-5">
+        <!-- Mensaje flash -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show animate__animated animate__fadeIn" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show animate__animated animate__fadeIn" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2 class="fw-bold" style="color: var(--primary-color);">
+                    <i class="bi bi-trophy me-2"></i>Listado de Competiciones
+                </h2>
+                <p class="text-muted">Administra todas las competiciones registradas en el sistema</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a th:href="@{/competiciones/nuevo}" class="btn btn-gold">
+                    <i class="bi bi-plus-circle me-1"></i> Nueva Competición
+                </a>
+            </div>
+        </div>
+
+        <!-- Tarjeta con la tabla -->
+        <div class="card border-0 shadow-lg animate__animated animate__fadeInUp">
+            <div class="card-header py-3">
+                <h5 class="mb-0 text-white"><i class="bi bi-table me-2"></i>Registros de Competiciones</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                   <table class="table table-hover align-middle mb-0">
+    <thead>
+        <tr>
+            <th class="text-center">Nombre</th>
+            <th class="text-center">Monto Premio</th>
+            <th class="text-center">Fecha Inicio</th>
+            <th class="text-center">Fecha Fin</th>
+            <th class="text-center">Duración (días)</th>
+            <th class="text-center">Clubes Participantes</th>
+            <th class="text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="competicion : ${competiciones}" class="hover-highlight">
+                                <td class="text-center fw-bold" th:text="${competicion.nombre}"></td>
+                                <td class="text-center" th:text="${'$' + #numbers.formatDecimal(competicion.montoPremio, 0, 'COMMA', 2, 'POINT')}"></td>
+                                <td class="text-center" th:text="${#temporals.format(competicion.fechaInicio, 'dd/MM/yyyy')}"></td>
+                                <td class="text-center" th:text="${#temporals.format(competicion.fechaFin, 'dd/MM/yyyy')}"></td>
+                                <td class="text-center" th:text="${diasPorCompeticion[competicion.id]}"></td>
+                                 <td class="text-center">
+                <span th:text="${clubesCountPorCompeticion[competicion.id]} + ' club(es)'"></span>
+                <button th:if="${clubesCountPorCompeticion[competicion.id]} > 0" 
+                        class="btn btn-sm btn-outline-primary ms-2" 
+                        data-bs-toggle="modal" 
+                        th:attr="data-bs-target='#modalClubes_' + ${competicion.id}">
+                    <i class="bi bi-eye"></i> Ver
+                </button>
+
+            </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/competiciones/editar/{id}(id=${competicion.id})}" 
+                                           class="btn btn-sm btn-outline-gold">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <a th:href="@{/competiciones/eliminar/{id}(id=${competicion.id})}" 
+                                           class="btn btn-sm btn-outline-danger btn-eliminar">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal -->
+<div th:each="competicion : ${competiciones}" th:if="${clubesCountPorCompeticion[competicion.id]} > 0">
+    <div class="modal fade" th:id="'modalClubes_' + ${competicion.id}" tabindex="-1"
+         th:attr="aria-labelledby='modalLabel_' + ${competicion.id}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg animate__animated animate__fadeInUp">
+                <div class="modal-header" style="background: var(--primary-color, #212529); color: #fff;">
+                    <h5 class="modal-title fw-bold" th:id="'modalLabel_' + ${competicion.id}"
+                        th:text="'Clubes en ' + ${competicion.nombre}"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    <ul class="list-group list-group-flush">
+                        <li th:each="club : ${competicion.clubes}"
+                            class="list-group-item d-flex justify-content-between align-items-center border-0"
+                            style="background: transparent;">
+                            <span class="fw-semibold" th:text="${club.nombre}"></span>
+                            <span class="badge rounded-pill"
+                                  style="background: var(--primary-color, #212529); color: #ffffff;"
+                                  th:text="${club.pais}"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-gold" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Configuración de SweetAlert2 para eliminar
+        document.querySelectorAll('.btn-eliminar').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('href');
+                
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "¡No podrás revertir esto!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#118723',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    background: '#fff',
+                    iconColor: '#d33'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = url;
+                    }
+                });
+            });
+        });
+
+                // Asegurar que los modales se cierren correctamente
+        document.addEventListener('DOMContentLoaded', function() {
+            var modals = document.querySelectorAll('.modal');
+            modals.forEach(function(modal) {
+                modal.addEventListener('shown.bs.modal', function () {
+                    // Forzar el z-index si es necesario
+                    var backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.style.zIndex = '1040';
+                    }
+                    modal.style.zIndex = '1050';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
