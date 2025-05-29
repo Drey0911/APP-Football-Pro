@@ -5,7 +5,7 @@ ManyToMany, ManyToOne, OneToOne, OneToMany y funciona para la gestion de clubes 
 
 ## Tecnologias
 
-Este proyecto fue realizado con Java Web usando el framwork SpringBoot con el enfoque 
+Este proyecto fue realizado con Java Web usando el framework SpringBoot con el enfoque 
 entidades, controlador y repositorios con JPA, Servlet y una BD local H2 con plantillas
 en Html Thymeleaf, CSS y Boostrap
 
