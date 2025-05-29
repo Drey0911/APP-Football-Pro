@@ -1,4 +1,4 @@
-# Smart Pets
+# Football PRO
 
 Este proyecto es un aplicativo para la explicacion del uso de las relaciones en springboot
 ManyToMany, ManyToOne, OneToOne, OneToMany y funciona para la gestion de clubes de futbol
